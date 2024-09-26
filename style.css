@@ -1,0 +1,119 @@
+body {
+  display: grid;
+  position: relative;
+  background: radial-gradient(navy, black);
+  justify-content: center;
+}
+
+#main {
+  margin: 0 auto;
+}
+
+.titleDiv {
+  display: grid;
+  width: fit-content;
+  margin: 10px auto;
+  padding: 0px;
+  color: white;
+  text-align: center;
+  z-index: 1000;
+}
+  
+.titleDiv a {
+  margin: 0 auto;
+  font-family: "Tektur", system-ui;
+  color: Orange;
+  font-size: 2.5em ;
+  text-decoration: none;
+}
+  
+
+#topContainer, #bottomContainer {
+  display: flex;
+  position: relative;
+  width: 370px;
+  height: 200px;
+  border-radius: 20px;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 20px ;
+  box-sizing: border-box;
+}
+
+#topContainer {
+  background-color: #8080FF;
+}
+
+#bottomContainer {
+  display: grid;
+  height: auto;
+  background-color: #8080FF;
+  padding: 5px 0px;
+  justify-content: center;
+}
+
+.gridContainer {
+  display: grid !important;
+  height: auto !important;
+  justify-items: center;
+}
+
+.box {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  display: grid;
+  background-color: #FFF0AA;
+  border-radius: 50%;
+}
+
+#box1 {
+  background-color: lightgreen;
+  border: 10px inset black;
+}
+
+.box:hover {
+  cursor: pointer;
+}
+
+.label {
+  display: grid;
+  justify-self: center;
+  align-self: center;
+  font-size: 2em;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  pointer-events: none;
+}
+
+.visualizer, canvas {
+  width: 365px;
+  height: 250px;
+  background-color: black;
+  border-radius: 20px;
+
+}
+
+.visualizer {
+  margin: 10px;
+}
+
+#tracks {
+  text-align: center;
+}
+
+#volumeField, #trackField, #tracks{
+  display: flex;
+  margin: 0 auto 10px auto;
+  color: black;
+  font-size: 30px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 300px;
+  justify-content: space-evenly;
+  align-items: center;
+  border-radius: 20px;
+  border: 2px solid black;
+}
+
+#volumeTxt {
+  width: 4ch;
+}

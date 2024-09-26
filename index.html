@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang = "en-us">
+  <head>
+    <meta name = "viewport" content = "width= device-width, initial-scale = 1";>
+    <meta charset = 'UTF-8'>
+    <link rel="stylesheet" href = "style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tektur" rel="stylesheet">
+    <title>Web Audio Practice</title>
+  </head>
+
+  <body>
+    <audio id = "violinTrack" src="tracks/violinTrack.mp3"></audio>
+    <audio id = "danceTrack" src="tracks/DanceTrackG.wav"></audio>
+    <audio id = "popTrack" src="tracks/PopTrackG.wav"></audio>
+    <audio id = "darkDiscoTrack" src="tracks/DarkDiscoTrackG.mp3"></audio>
+    <audio id = "eightiesTrack" src="tracks/EightiesTrack.mp3"></audio>
+    <div id = "main">
+      <div class = "titleDiv">
+        <a href = "">Audio Visualizers</a>
+      </div>
+      <div id = "topContainer" class = "gridContainer">
+        <div class = "box" id = "box1">
+          <div class = "label">Play Track</div>
+        </div>
+
+        <fieldset id = "trackField">
+          <legend>Track</legend>
+          <select name = "tracks" id = "tracks" class = "hide"> 
+            <option value ="" disabled>Select a track <!--&#9964--></option>
+            <option value = "danceTrack">Dance Track</option>
+            <option value = "popTrack">Pop Track</option>
+            <option value= "eightiesTrack">80's Track</option>
+            <option value= "darkDiscoTrack">Dark Disco Track</option>
+            <option value = "violinTrack">Violin Track</option>
+          </select>
+          <option></option>
+        </fieldset>
+
+        <fieldset id = "volumeField">
+          <legend>Volume</legend>
+          <span id = "volumeTxt">1.0</span>
+          <input type="range" id="volume" min="0" max="2" value="1" step="0.01" />
+        </fieldset>
+      </div>
+
+
+      <div id = "bottomContainer">
+        <div class = "visualizer">
+          <canvas id = "vis2"></canvas>
+        </div>
+        <div class = "visualizer">
+          <canvas id = "vis1"></canvas>
+        </div>
+        <div class = "visualizer">
+          <canvas id = "vis3"></canvas>
+        </div>
+      </div>
+    </div>
+    
+    <script src = "index.js"></script>
+  </body>
+</html>
