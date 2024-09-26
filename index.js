@@ -1,5 +1,6 @@
-const box1 = document.querySelector('#box1');
-const box2 = document.querySelector('#box2');
+//////////////////////////////////////// Global Contants ////////////////////////////////////////
+
+const btn1 = document.querySelector('#btn1');
 const canvas1 = document.querySelector('#vis1');
 const canvas2 = document.querySelector('#vis2');
 const canvas3 = document.querySelector('#vis3');
@@ -8,10 +9,13 @@ const visCtx2 = canvas2.getContext("2d");
 const visCtx3 = canvas3.getContext("2d");
 const volumeControl = document.querySelector("#volume");
 const trackOption = document.querySelector("#tracks")
+
+//////////////////////////////////////// Global Variables ////////////////////////////////////////
+
 let playing = false;
 let freqAnimationLoop;
 let waveAnimationLoop;
-let spectogramAnimationLoop;
+let spectrogramAnimationLoop;
 let frameLength
 let freqHeight
 
@@ -21,13 +25,14 @@ let analyser
 let bufferLength 
 let dataFreqArray 
 let dataWaveArray
-let dataSpectogramFreqArray
-let dataSpectogramWaveArray
+let dataSpectrogramFreqArray
 
 let currentX = 0
 let track;
 let audioElem;
 
+
+//////////////////////////////////////// Audion Context Functions ////////////////////////////////////////
 
 
 async function createAudioContext() {
@@ -47,8 +52,7 @@ async function createAudioContext() {
     bufferLength = analyser.frequencyBinCount;
     dataFreqArray = new Float32Array(bufferLength);
     dataWaveArray = new Float32Array(bufferLength);
-    dataSpectogramFreqArray = new Float32Array(bufferLength);
-    dataSpectogramWaveArray = new Float32Array(bufferLength);
+    dataSpectrogramFreqArray = new Float32Array(bufferLength);
   })
 }
 
@@ -69,15 +73,21 @@ function chooseTrack(trackTxt) {
 }
 
 
+function getFrequency(index) {
+  const nyquist = audioCtx.sampleRate / 2;
+  return index * nyquist / bufferLength;
+}
+
+
+//////////////////////////////////////// Event Listeners ////////////////////////////////////////
+
 
 trackOption.addEventListener("change", (e) => {
   chooseTrack(e.target.value)
 })
 
 
-
-
-box1.addEventListener("click", (e) => {
+btn1.addEventListener("click", (e) => {
   if (audioElem == null) {
     chooseTrack(trackOption.value) 
   }
@@ -87,8 +97,8 @@ box1.addEventListener("click", (e) => {
     playing = true;
     drawFreq(visCtx1);
     drawWave(visCtx2)
-    drawSpectogramAnimationFrame(visCtx3)
-    //drawSpectogram(visCtx3)
+    drawSpectrogramAnimationFrame(visCtx3)
+    //drawSpectrogram(visCtx3)
 
   }
 
@@ -98,9 +108,9 @@ box1.addEventListener("click", (e) => {
     playing = true;
     drawFreq(visCtx1);
     drawWave(visCtx2)
-    drawSpectogramAnimationFrame(visCtx3)
+    drawSpectrogramAnimationFrame(visCtx3)
 
-    //drawSpectogram(visCtx3)
+    //drawSpectrogram(visCtx3)
   } 
   else if (playing == true) {
     audioElem.pause();
@@ -111,45 +121,30 @@ box1.addEventListener("click", (e) => {
 
 
 
-
-
 volumeControl.addEventListener("input", () => {
     gainNode.gain.value = volumeControl.value;
     document.querySelector("#volumeTxt").innerHTML = volumeControl.value
 },false);
 
 
-function getFrequency(index) {
-  const nyquist = audioCtx.sampleRate / 2;
-  return index * nyquist / bufferLength;
-}
 
-
+//////////////////////////////////////// Draw Functions ////////////////////////////////////////
 
 function drawFreq(canvasCtx) {
-  //Schedule next redraw
   canvasCtx = visCtx1
   freqAnimationLoop = window.requestAnimationFrame(drawFreq);
 
-
-
-  //Get spectrum data
+  //Get data
   analyser.getFloatFrequencyData(dataFreqArray);
 
-  //Draw black background
   canvasCtx.fillStyle = "rgb(0 0 0)";
-  //canvasCtx.fillStyle = "rgba(0, 0, 0, .01)";
   canvasCtx.fillRect(0, 0, 360, 250);
 
-  //Draw spectrum
   const barWidth = (360 / bufferLength) * 2.5;
   let posX = 0;
   for (let i = 0; i < bufferLength; i++) {
     const barHeight = (dataFreqArray[i] + 200) * 2.3;
-    //const barHeight = (dataFreqArray[i] + 140) * 3.5;
     canvasCtx.fillStyle = `rgb(50 50 ${Math.floor(barHeight + 100)})`;
-    //canvasCtx.fillStyle = `rgb(${Math.floor(Math.random() * 225) + 20},
-    //${Math.floor(Math.random() * 225) + 20}, ${Math.floor(Math.random() * 225) + 20})`
     canvasCtx.fillRect(
       posX,
       250 - barHeight / 2,
@@ -170,7 +165,6 @@ function drawFreq(canvasCtx) {
 
 
 function drawWave(canvasCtx) {
-  //Schedule next redraw
   canvasCtx = visCtx2
   waveAnimationLoop = window.requestAnimationFrame(drawWave);
 
@@ -189,12 +183,6 @@ function drawWave(canvasCtx) {
   for (let i = 0; i < bufferLength; i++) {
     const v = dataWaveArray[i] * 50.0; //200
     const y = 170 / 2 + v; //250/2
-    //if (i == 200) {
-      //console.log(dataWaveArray[i])
-      //console.log(`i is ${i} and v is ${v} || x is ${x} and y is ${y}`)
-    //}
-
-
     if (i === 0) {
       canvasCtx.moveTo(x, y);
     } else {
@@ -212,39 +200,32 @@ function drawWave(canvasCtx) {
     window.cancelAnimationFrame(waveAnimationLoop)
   }
 
-
 }
 
-// yellow rgb(255, 255, 0);
-// dark red rgb(100, 0, 0);
 
+function drawSpectrogramAnimationFrame(canvasCtx) {
 
-
-
-function drawSpectogramAnimationFrame(canvasCtx) {
-  //Schedule next redraw
   canvasCtx = visCtx3
-  //Draw black background
-  //canvasCtx.fillStyle = "rgb(0 0 0)";
   canvasCtx.fillStyle = "rgba(0, 0, 0, .001)";
   canvasCtx.fillRect(0, 0, 360, 250);
-  spectogramAnimationLoop = window.requestAnimationFrame(drawSpectogramAnimationFrame);
-  analyser.getFloatFrequencyData(dataSpectogramFreqArray);
+
+  spectrogramAnimationLoop = window.requestAnimationFrame(drawSpectrogramAnimationFrame);
+
+  analyser.getFloatFrequencyData(dataSpectrogramFreqArray);
   let currentY = 0;
 
   for (let i = bufferLength; i > 0; i--) {
     let yellowSpectrum = 255
     let redSpectrum = 255
 
-    if (dataSpectogramFreqArray[i] <= -90 ) { 
-      yellowSpectrum += (dataSpectogramFreqArray[i]);
+    if (dataSpectrogramFreqArray[i] <= -90 ) { 
+      yellowSpectrum += (dataSpectrogramFreqArray[i]);
       if (yellowSpectrum < 50)  {
         yellowSpectrum = 0
         redSpectrum = 0
       }
     }
-    //console.log(`Freq: ${i} - yellow spect: ${yellowSpectrum} | ${dataSpectogramFreqArray[i]}`)
-
+    //console.log(`Freq: ${i} - yellow spect: ${yellowSpectrum} | ${dataSpectrogramFreqArray[i]}`)
     canvasCtx.fillStyle = `rgb(${redSpectrum} ${yellowSpectrum} 0)`;
 
     canvasCtx.fillRect(
@@ -260,9 +241,7 @@ function drawSpectogramAnimationFrame(canvasCtx) {
 
   if (!playing) {
     console.log(playing)
-    //canvasCtx.fillStyle = "rgb(0 0 0)";
-    //canvasCtx.fillRect(0, 0, 360, 250);
-    window.cancelAnimationFrame(spectogramAnimationLoop)
+    window.cancelAnimationFrame(spectrogramAnimationLoop)
   }
   
 
@@ -270,21 +249,18 @@ function drawSpectogramAnimationFrame(canvasCtx) {
 
 
 
-function drawSpectogram(canvasCtx) {
-  //Schedule next redraw
+function drawSpectrogram(canvasCtx) {
+
   canvasCtx = visCtx3
-  //Draw black background
-  canvasCtx.fillStyle = "rgb(0 0 0)";
   //canvasCtx.fillStyle = "rgba(0, 0, 0, .01)";
-  canvasCtx.fillRect(0, 0, 360, 250);
+  //canvasCtx.fillRect(0, 0, 360, 250);
   
-  spectogramAnimationLoop = setInterval(() => {
-    analyser.getFloatFrequencyData(dataSpectogramFreqArray);
+  spectrogramAnimationLoop = setInterval(() => {
+    analyser.getFloatFrequencyData(dataSpectrogramFreqArray);
     let currentY = 0;
 
     for (let i = bufferLength; i > 0; i--) {
-      //let currentFreq = getFrequency(index);
-      let yellowSpectrum = 255 + dataSpectogramFreqArray[i];
+      let yellowSpectrum = 255 + dataSpectrogramFreqArray[i];
       let redSpectrum = 255
       if (yellowSpectrum <= 150) { //0
         if (yellowSpectrum >= 0) {
@@ -310,14 +286,14 @@ function drawSpectogram(canvasCtx) {
       currentY += freqHeight;
 
       if (!playing) {
-        clearInterval(spectogramAnimationLoop)
+        clearInterval(spectrogramAnimationLoop)
         break;
       }
     }
     currentX += frameLength;
 
     if (!playing) {
-      clearInterval(spectogramAnimationLoop)
+      clearInterval(spectrogramAnimationLoop)
     }
   }, 20)
 
