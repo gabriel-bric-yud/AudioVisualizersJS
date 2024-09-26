@@ -58,32 +58,26 @@ body {
   justify-items: center;
 }
 
-.box {
-  width: 150px;
-  height: 150px;
-  position: relative;
-  display: grid;
-  background-color: #FFF0AA;
-  border-radius: 50%;
-}
+
 
 #btn1 {
+  display: grid;
   background-color: lightgreen;
+  width: 150px;
+  height: 150px;
   border: 10px inset black;
+  font-size: 2em;
+  border-radius: 50%;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
 }
 
-.box:hover {
+#btn1:hover {
   cursor: pointer;
 }
 
-.label {
-  display: grid;
-  justify-self: center;
-  align-self: center;
-  font-size: 2em;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  pointer-events: none;
-}
 
 .visualizer, canvas {
   width: 365px;

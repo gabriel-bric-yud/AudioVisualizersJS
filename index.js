@@ -46,6 +46,11 @@ async function createAudioContext() {
   visCtx3.fillRect(0, 0, 360, 250);
   await audioCtx.suspend().then(() =>  audioCtx.close()).then(() => {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (track != null) {
+      track.disconnect();
+      analyser.disconnect()
+      gainNode.disconnect()
+    }
     gainNode = audioCtx.createGain();
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 1024; //256
@@ -60,6 +65,7 @@ async function createAudioContext() {
 function chooseTrack(trackTxt) {
   createAudioContext().then(() => {
     audioElem = document.querySelector(`#${trackTxt}`);
+
     track = audioCtx.createMediaElementSource(audioElem);
     track.connect(analyser).connect(gainNode).connect(audioCtx.destination);
     frameLength = 360 / ((audioElem.duration * 1000)/ 3.2) ; //17
