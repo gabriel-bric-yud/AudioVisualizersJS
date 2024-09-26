@@ -29,6 +29,7 @@ let track;
 let audioElem;
 
 
+
 async function createAudioContext() {
   playing = false;
   currentX = 0;
@@ -67,7 +68,7 @@ function chooseTrack(trackTxt) {
 
 }
 
-chooseTrack("danceTrack") 
+
 
 trackOption.addEventListener("change", (e) => {
   chooseTrack(e.target.value)
@@ -77,6 +78,9 @@ trackOption.addEventListener("change", (e) => {
 
 
 box1.addEventListener("click", (e) => {
+  if (audioElem == null) {
+    chooseTrack(trackOption.value) 
+  }
 
   if (audioCtx.state === "suspended") {
     audioCtx.resume();
