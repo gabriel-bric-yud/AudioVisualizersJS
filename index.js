@@ -170,7 +170,7 @@ function drawWave(canvasCtx) {
 
   analyser.getFloatTimeDomainData(dataWaveArray);
 
-  canvasCtx.fillStyle = "rgba(0, 0, 0, .06)"; //.001
+  canvasCtx.fillStyle = "rgba(0, 0, 0, .03)"; //.001
   canvasCtx.fillRect(0, 0, 360, 250);
   canvasCtx.lineWidth = 2;
   canvasCtx.strokeStyle = `rgb(${Math.floor(Math.random() * 225) + 20},
