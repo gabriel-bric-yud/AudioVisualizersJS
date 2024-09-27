@@ -20,6 +20,7 @@ let frameLength
 let freqHeight
 
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+console.log(audioCtx.sampleRate);
 let gainNode
 let analyser
 let bufferLength 
@@ -53,7 +54,7 @@ async function createAudioContext() {
     }
     gainNode = audioCtx.createGain();
     analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 1024; //256
+    analyser.fftSize = 1024; //Samples at 60fps for 48000 sample rate
     bufferLength = analyser.frequencyBinCount;
     dataFreqArray = new Float32Array(bufferLength);
     dataWaveArray = new Float32Array(bufferLength);
@@ -68,7 +69,9 @@ function chooseTrack(trackTxt) {
 
     track = audioCtx.createMediaElementSource(audioElem);
     track.connect(analyser).connect(gainNode).connect(audioCtx.destination);
-    frameLength = 360 / ((audioElem.duration * 1000)/ 3.2) ; //17
+    console.log(audioElem)
+    console.log(audioElem.duration)
+    frameLength = 360 / ((audioElem.duration * 1000)/ 3.2) ; //frameLength = 360 / (audioElem.duration * 240)
     freqHeight = 250 / bufferLength;
     audioElem.addEventListener("ended",() => {
       playing = false;
@@ -176,7 +179,7 @@ function drawWave(canvasCtx) {
 
   analyser.getFloatTimeDomainData(dataWaveArray);
 
-  canvasCtx.fillStyle = "rgba(0, 0, 0, .03)"; //.001
+  canvasCtx.fillStyle = "rgba(0, 0, 0, .3)"; //.001
   canvasCtx.fillRect(0, 0, 360, 250);
   canvasCtx.lineWidth = 2;
   canvasCtx.strokeStyle = `rgb(${Math.floor(Math.random() * 225) + 20},
@@ -222,11 +225,11 @@ function drawSpectrogramAnimationFrame(canvasCtx) {
 
   for (let i = bufferLength; i > 0; i--) {
     let yellowSpectrum = 255
-    let redSpectrum = 255
+    let redSpectrum = 190
 
-    if (dataSpectrogramFreqArray[i] <= -90 ) { 
-      yellowSpectrum += (dataSpectrogramFreqArray[i]);
-      if (yellowSpectrum < 50)  {
+    if (dataSpectrogramFreqArray[i] <= -25 ) { 
+      yellowSpectrum += ((dataSpectrogramFreqArray[i]) * 0.8);
+      if (yellowSpectrum < 0)  {
         yellowSpectrum = 0
         redSpectrum = 0
       }
