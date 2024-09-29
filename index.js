@@ -63,7 +63,16 @@ async function createInitialAudioContext() {
     dataSpectrogramFreqArray = new Float32Array(bufferLength);
     frameLength = 360 / ((audioElem.duration * 1000)/ 3.2) ; //frameLength = 360 / (audioElem.duration * 240)
     freqHeight = 250 / bufferLength;
-    track.connect(analyser).connect(gainNode).connect(audioCtx.destination);
+
+
+    const compressor = audioCtx.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-50, audioCtx.currentTime);
+    compressor.knee.setValueAtTime(40, audioCtx.currentTime);
+    compressor.ratio.setValueAtTime(12, audioCtx.currentTime);
+    compressor.attack.setValueAtTime(0, audioCtx.currentTime);
+    compressor.release.setValueAtTime(0.25, audioCtx.currentTime);
+
+    track.connect(gainNode).connect(compressor).connect(analyser).connect(audioCtx.destination);
   })
 }
 
