@@ -7,6 +7,7 @@ const canvas3 = document.querySelector('#vis3');
 const visCtx1 = canvas1.getContext("2d");
 const visCtx2 = canvas2.getContext("2d");
 const visCtx3 = canvas3.getContext("2d");
+const audioElem = document.querySelector("#musicTrack");
 const volumeControl = document.querySelector("#volume");
 const trackOption = document.querySelector("#tracks")
 
@@ -19,8 +20,7 @@ let spectrogramAnimationLoop;
 let frameLength
 let freqHeight
 
-let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-console.log(audioCtx.sampleRate);
+let audioCtx
 let gainNode
 let analyser
 let bufferLength 
@@ -29,14 +29,13 @@ let dataWaveArray
 let dataSpectrogramFreqArray
 
 let currentX = 0
-let track;
-let audioElem;
+
 
 
 //////////////////////////////////////// Audion Context Functions ////////////////////////////////////////
 
 
-async function createAudioContext() {
+async function updateAudioContext(trackTxt) {
   playing = false;
   currentX = 0;
   visCtx1.fillStyle = "rgba(0, 0, 0)";
@@ -45,13 +44,16 @@ async function createAudioContext() {
   visCtx2.fillRect(0, 0, 360, 250);
   visCtx3.fillStyle = "rgba(0, 0, 0)"; 
   visCtx3.fillRect(0, 0, 360, 250);
-  await audioCtx.suspend().then(() =>  audioCtx.close()).then(() => {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (track != null) {
-      track.disconnect();
-      analyser.disconnect()
-      gainNode.disconnect()
-    }
+  await audioCtx.suspend()
+  .then(() =>  chooseTrack(trackTxt))
+}
+
+async function createInitialAudioContext() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  console.log(trackOption.value)
+  await updateAudioContext(trackOption.value)
+  .then(() => {
+    let track = audioCtx.createMediaElementSource(audioElem);
     gainNode = audioCtx.createGain();
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 1024; //Samples at 60fps for 48000 sample rate
@@ -59,28 +61,24 @@ async function createAudioContext() {
     dataFreqArray = new Float32Array(bufferLength);
     dataWaveArray = new Float32Array(bufferLength);
     dataSpectrogramFreqArray = new Float32Array(bufferLength);
+    frameLength = 360 / ((audioElem.duration * 1000)/ 3.2) ; //frameLength = 360 / (audioElem.duration * 240)
+    freqHeight = 250 / bufferLength;
+    track.connect(analyser).connect(gainNode).connect(audioCtx.destination);
   })
 }
 
 
 function chooseTrack(trackTxt) {
-  createAudioContext().then(() => {
-    audioElem = document.querySelector(`#${trackTxt}`);
-
-    track = audioCtx.createMediaElementSource(audioElem);
-    track.connect(analyser).connect(gainNode).connect(audioCtx.destination);
-    console.log(audioElem)
-    console.log(audioElem.duration)
-    frameLength = 360 / ((audioElem.duration * 1000)/ 3.2) ; //frameLength = 360 / (audioElem.duration * 240)
-    freqHeight = 250 / bufferLength;
-    audioElem.addEventListener("ended",() => {
-      playing = false;
-      currentX = 0;
-    },false);
+  return new Promise(resolve => {
+    dataFreqArray = new Float32Array(bufferLength);
+    dataWaveArray = new Float32Array(bufferLength);
+    dataSpectrogramFreqArray = new Float32Array(bufferLength);
+    audioElem.src = `tracks/${trackTxt}`;
+    audioElem.load();
+    audioElem.addEventListener("canplay", resolve);
   })
-
 }
-
+ 
 
 function getFrequency(index) {
   const nyquist = audioCtx.sampleRate / 2;
@@ -90,16 +88,20 @@ function getFrequency(index) {
 
 //////////////////////////////////////// Event Listeners ////////////////////////////////////////
 
+createInitialAudioContext() 
+
+audioElem.addEventListener("ended",() => {
+  playing = false;
+  currentX = 0;
+},false);
+
 
 trackOption.addEventListener("change", (e) => {
-  chooseTrack(e.target.value)
+  updateAudioContext(e.target.value)
 })
 
 
 btn1.addEventListener("click", (e) => {
-  if (audioElem == null) {
-    chooseTrack(trackOption.value) 
-  }
 
   if (audioCtx.state === "suspended") {
     audioCtx.resume();
@@ -213,6 +215,7 @@ function drawWave(canvasCtx) {
 
 
 function drawSpectrogramAnimationFrame(canvasCtx) {
+
 
   canvasCtx = visCtx3
   canvasCtx.fillStyle = "rgba(0, 0, 0, .001)";
