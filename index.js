@@ -51,7 +51,8 @@ async function updateAudioContext(trackTxt) {
 async function createInitialAudioContext() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   console.log(trackOption.value)
-  await updateAudioContext(trackOption.value)
+  //await updateAudioContext(trackOption.value)
+  await updateAudioContext("DanceTrackG.wav")
   .then(() => {
     let track = audioCtx.createMediaElementSource(audioElem);
     gainNode = audioCtx.createGain();
